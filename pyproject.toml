@@ -1,0 +1,17 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "course-cli"
+version = "0.1.0"
+description = "CLI tool for structuring educational courses"
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = [
+    "click",
+    "PyYAML"
+]
+
+[project.scripts]
+course-cli = "course_cli.cli:main"
