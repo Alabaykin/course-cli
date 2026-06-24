@@ -21,3 +21,5 @@ demo: setup
 	@cd temp_demo && ../$(VENV_BIN)/course-cli init "Demo Course"
 	@echo "Демонстрационный курс создан в папке temp_demo/"
 
+clean:
+	rm -rf $(VENV) .pytest_cache temp_demo *.egg-info course_cli.egg-info src/course_cli.egg-info
