@@ -14,3 +14,10 @@ setup: $(VENV)
 test: setup
 	$(PYTHON) -m pytest tests/
 
+demo: setup
+	@echo "Создаем тестовый курс во временной папке..."
+	@rm -rf temp_demo
+	@mkdir -p temp_demo
+	@cd temp_demo && ../$(VENV_BIN)/course-cli init "Demo Course"
+	@echo "Демонстрационный курс создан в папке temp_demo/"
+
