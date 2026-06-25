@@ -74,7 +74,26 @@ fi
 echo -e "${GREEN}✅ Валидация успешно пройдена. Коммит разрешен.${NC}"
 exit 0
 '''
+    with open(hook_path, 'w', encoding='utf-8', newline='\\n') as f:
+        f.write(hook_script)
+
+    st = os.stat(hook_path)
+    os.chmod(hook_path, st.st_mode | stat.S_IEXEC)
+
+    git_configured = False
+    try:
+        if not (base_path / '.git').exists():
+            subprocess.run(['git', 'init'], cwd=str(base_path), check=True, capture_output=True)
+        subprocess.run(['git', 'config', 'core.hooksPath', '.githooks'], cwd=str(base_path), check=True, capture_output=True)
+        git_configured = True
+    except (FileNotFoundError, subprocess.CalledProcessError):
+        pass
+
+    msg = f"Структура курса успешно создана в '{base_path.resolve()}'"
+    if git_configured:
+        msg += "\\n✅ Git репозиторий инициализирован и защищен pre-commit хуком."
+
     return {
         'is_success': True,
-        'message': f"Структура курса успешно создана в '{base_path.resolve()}'"
+        'message': msg
     }
