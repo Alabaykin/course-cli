@@ -1,4 +1,5 @@
 import sys
+from pathlib import Path
 import click
 from course_cli.init import init_course_structure
 from course_cli.validate import validate_course_structure
@@ -50,6 +51,32 @@ def validate(course_dir):
 
     if report['is_valid']:
         click.echo("✅ Курс валиден!")
+        
+        # Получаем название курса из course.yaml
+        yaml_path = Path(course_dir) / 'course.yaml'
+        course_title = Path(course_dir).resolve().name
+        if yaml_path.exists():
+            import yaml
+            try:
+                with open(yaml_path, 'r', encoding='utf-8') as f:
+                    data = yaml.safe_load(f)
+                    if data and 'title' in data:
+                        course_title = data['title']
+            except Exception:
+                pass
+                
+        # Отправка события xAPI
+        try:
+            stmt = generate_xapi_statement(
+                verb_id='http://activitystrea.ms/schema/1.0/validate',
+                verb_display='проверил',
+                course_title=course_title,
+                course_path=course_dir,
+                success=True
+            )
+            send_xapi_statement(stmt)
+        except Exception as e:
+            click.echo(f"Предупреждение: не удалось залогировать xAPI событие: {e}", err=True)
     else:
         click.echo("❌ Найдены ошибки:")
         for err in report['errors']:
