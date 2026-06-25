@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+NC='\033[0m' # No Color
 
 echo "Очередь pre-commit: Запуск Course CLI валидации..."
 
@@ -25,3 +28,12 @@ if [ $STASH_CREATED -eq 1 ]; then
     git stash pop -q
 fi
 
+# Обработка результата
+if [ $RESULT -ne 0 ]; then
+    echo -e "${RED}❌ Коммит отклонен: Найдены ошибки в структуре курса или course.yaml.${NC}"
+    echo -e "${RED}Пожалуйста, исправьте ошибки, добавьте файлы через 'git add' и попробуйте снова.${NC}"
+    exit 1
+fi
+
+echo -e "${GREEN}✅ Валидация успешно пройдена. Коммит разрешен.${NC}"
+exit 0
