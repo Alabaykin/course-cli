@@ -105,3 +105,47 @@ def generate_xapi_statement(
 
     return statement
 
+
+def send_xapi_statement(statement: dict[str, Any]) -> None:
+    '''
+    Send xAPI statement to LRS (if configured) and write to local mock_lrs.log.
+
+    Args:
+        statement (dict[str, Any]): The xAPI statement to send.
+    '''
+    # 1. Запись в локальный лог mock_lrs.log
+    log_path = Path('mock_lrs.log')
+    try:
+        with open(log_path, 'a', encoding='utf-8') as f:
+            f.write(json.dumps(statement, ensure_ascii=False) + '\n')
+    except Exception as e:
+        print(f'Ошибка записи в локальный LRS лог: {e}', file=sys.stderr)
+
+    # 2. Отправка во внешний LRS
+    load_env()
+    lrs_url = os.environ.get('LRS_URL')
+    mock_mode = os.environ.get('LRS_MOCK_MODE', 'True').lower() == 'true'
+
+    if lrs_url and not mock_mode:
+        import urllib.request
+        from urllib.error import URLError
+        
+        try:
+            data = json.dumps(statement, ensure_ascii=False).encode('utf-8')
+            req = urllib.request.Request(
+                lrs_url,
+                data=data,
+                headers={
+                    'Content-Type': 'application/json',
+                    'X-Experience-API-Version': '1.0.3'
+                },
+                method='POST'
+            )
+            with urllib.request.urlopen(req, timeout=3.0) as response:
+                pass
+        except URLError as e:
+            print(f'Предупреждение: не удалось отправить xAPI событие в LRS: {e}', file=sys.stderr)
+        except Exception as e:
+            print(f'Предупреждение: ошибка при отправке xAPI события: {e}', file=sys.stderr)
+
+
