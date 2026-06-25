@@ -3,6 +3,13 @@
 
 echo "Очередь pre-commit: Запуск Course CLI валидации..."
 
+# Проверка: есть ли непроиндексированные изменения.
+# Если есть, прячем их, оставляя в рабочем дереве только то, что попадет в коммит.
+STASH_CREATED=0
+if ! git diff --quiet; then
+    git stash push -q --keep-index -m "course-cli-pre-commit-stash"
+    STASH_CREATED=1
+fi
 
 # Активируем виртуальное окружение
 if [ -f "./venv/bin/activate" ]; then
@@ -12,3 +19,9 @@ fi
 # Запускаем валидацию
 course-cli validate .
 RESULT=$?
+
+# Если мы прятали изменения, возвращаем их обратно в рабочее дерево
+if [ $STASH_CREATED -eq 1 ]; then
+    git stash pop -q
+fi
+
