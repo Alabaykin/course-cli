@@ -44,6 +44,14 @@ def init_course_structure(title: str, target_dir: str | Path) -> dict[str, Any]:
     hooks_dir.mkdir(exist_ok=True)
     
     hook_path = hooks_dir / 'pre-commit'
+    hook_script = '''#!/usr/bin/env bash
+
+
+echo "Очередь pre-commit: Запуск Course CLI валидации..."
+
+course-cli validate .
+exit 0
+'''
     return {
         'is_success': True,
         'message': f"Структура курса успешно создана в '{base_path.resolve()}'"
