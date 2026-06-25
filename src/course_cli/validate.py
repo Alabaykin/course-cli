@@ -1,10 +1,14 @@
 from __future__ import annotations
 
+import re
 import sys
 from pathlib import Path
 from typing import Any
 
 import yaml
+
+
+LINK_REGEX = re.compile(r'!?\[[^\]]*\]\(([^)]+)\)')
 
 
 def validate_course_metadata(course_dir: str | Path) -> dict[str, Any]:
