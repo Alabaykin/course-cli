@@ -1,6 +1,6 @@
 import sys
 import click
-
+from course_cli.init import init_course_structure
 from course_cli.validate import validate_course_structure
 
 
