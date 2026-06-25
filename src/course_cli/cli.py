@@ -1,6 +1,8 @@
+import sys
 import click
-from course_cli.init import init_course_structure
-from pathlib import Path
+
+from course_cli.validate import validate_course_structure
+
 
 @click.group()
 def main():
@@ -24,10 +26,19 @@ def init(title, target_dir):
         click.secho("❌ Произошла ошибка при создании курса", fg='red')
 
 @main.command()
-def validate():
+@click.argument('course_dir', default='.')
+def validate(course_dir):
     """Проверка структуры и метаданных курса."""
-    click.echo("Запуск проверок...")
-    # Эту часть будет делать Puslore
+    click.echo(f"Запуск проверок для директории: {course_dir}...")
+    report = validate_course_structure(course_dir)
+
+    if report['is_valid']:
+        click.echo("✅ Курс валиден!")
+    else:
+        click.echo("❌ Найдены ошибки:")
+        for err in report['errors']:
+            click.echo(f"  - {err}")
+        sys.exit(1)
 
 @main.command()
 def report():
