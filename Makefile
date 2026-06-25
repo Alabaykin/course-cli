@@ -21,9 +21,6 @@ $(VENV):
 setup: $(VENV)
 	$(PIP) install --upgrade pip
 	$(PIP) install -e .
-	git config core.hooksPath .githooks
-
-
 test: setup
 	$(PYTHON) -m pytest tests/
 
