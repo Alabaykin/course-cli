@@ -1,4 +1,6 @@
 import click
+from course_cli.init import init_course_structure
+from pathlib import Path
 
 @click.group()
 def main():
@@ -7,10 +9,19 @@ def main():
 
 @main.command()
 @click.argument('title')
-def init(title):
+@click.option('--dir', '-d', 'target_dir', default='.', type=click.Path(), help='Папка для создания курса')
+def init(title, target_dir):
     """Инициализация структуры нового курса."""
-    click.echo(f"Создание курса: {title}...")
-    # Здесь будет логика создания папок и файлов
+    click.echo(f"Создание курса: '{title}'...")
+    
+    # Вызов бизнес-логики
+    result = init_course_structure(title, target_dir)
+    
+    # Оформление результата
+    if result.get('is_success'):
+        click.secho(result['message'], fg='green')
+    else:
+        click.secho("❌ Произошла ошибка при создании курса", fg='red')
 
 @main.command()
 def validate():
