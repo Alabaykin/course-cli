@@ -77,7 +77,7 @@ fi
 echo -e "${GREEN}✅ Валидация успешно пройдена. Коммит разрешен.${NC}"
 exit 0
 '''
-    with open(hook_path, 'w', encoding='utf-8', newline='\\n') as f:
+    with open(hook_path, 'w', encoding='utf-8', newline='\n') as f:
         f.write(hook_script)
 
     st = os.stat(hook_path)
@@ -94,7 +94,7 @@ exit 0
 
     msg = f"Структура курса успешно создана в '{base_path.resolve()}'"
     if git_configured:
-        msg += "\\n✅ Git репозиторий инициализирован и защищен pre-commit хуком."
+        msg += "\n✅ Git репозиторий инициализирован и защищен pre-commit хуком."
 
     return {
         'is_success': True,
