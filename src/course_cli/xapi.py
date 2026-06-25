@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import os
 import sys
 from datetime import datetime, timezone
@@ -27,7 +28,8 @@ def load_env(env_path: str | Path = '.env') -> None:
                     key, val = line.split('=', 1)
                     key_str = key.strip()
                     val_str = val.strip().strip('\'"')
-                    os.environ[key_str] = val_str
+                    if key_str not in os.environ:
+                        os.environ[key_str] = val_str
     except Exception as e:
         print(f'Ошибка при чтении .env: {e}', file=sys.stderr)
 
