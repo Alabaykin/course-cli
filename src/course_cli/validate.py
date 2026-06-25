@@ -176,7 +176,7 @@ if __name__ == '__main__':
     target_dir = sys.argv[1] if len(sys.argv) > 1 else './test_courses/invalid_course'
 
     print(f'Проверка курса в директории: {target_dir}')
-    report = validate_course_metadata(target_dir)
+    report = validate_course_structure(target_dir)
 
     if report['is_valid']:
         print('✅ Курс валиден!')
