@@ -76,7 +76,7 @@ def find_broken_links(course_dir: str | Path) -> list[str]:
     Returns:
         list[str]: A list of error messages for broken links.
     '''
-    dir_path = Path(course_dir)
+    dir_path = Path(course_dir).resolve()
     errors: list[str] = []
 
     # Находим все Markdown-файлы рекурсивно
@@ -143,7 +143,7 @@ def validate_course_structure(course_dir: str | Path) -> dict[str, Any]:
     Returns:
         dict[str, Any]: Validation report with keys 'is_valid' and 'errors'.
     '''
-    dir_path = Path(course_dir)
+    dir_path = Path(course_dir).resolve()
     errors: list[str] = []
 
     # 1. Валидация метаданных (course.yaml)
