@@ -1,6 +1,10 @@
 import sys
 from pathlib import Path
 import click
+
+# Настройка кодировки для корректного вывода emoji на Windows
+if sys.platform == 'win32':
+    sys.stdout.reconfigure(encoding='utf-8')
 from course_cli.init import init_course_structure
 from course_cli.validate import validate_course_structure
 from course_cli.report import generate_report
