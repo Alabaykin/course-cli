@@ -2,6 +2,10 @@ import sys
 import click
 from course_cli.init import init_course_structure
 from course_cli.validate import validate_course_structure
+from course_cli.xapi import load_env, generate_xapi_statement, send_xapi_statement
+
+# Загрузка переменных окружения
+load_env()
 
 
 @click.group()
@@ -22,6 +26,18 @@ def init(title, target_dir):
     # Оформление результата
     if result.get('is_success'):
         click.secho(result['message'], fg='green')
+        # Отправка события xAPI
+        try:
+            stmt = generate_xapi_statement(
+                verb_id='http://activitystrea.ms/schema/1.0/initialize',
+                verb_display='инициализировал',
+                course_title=title,
+                course_path=target_dir,
+                success=True
+            )
+            send_xapi_statement(stmt)
+        except Exception as e:
+            click.echo(f"Предупреждение: не удалось залогировать xAPI событие: {e}", err=True)
     else:
         click.secho("❌ Произошла ошибка при создании курса", fg='red')
 
