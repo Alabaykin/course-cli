@@ -66,6 +66,73 @@ def validate_course_metadata(course_dir: str | Path) -> dict[str, Any]:
     }
 
 
+def find_broken_links(course_dir: str | Path) -> list[str]:
+    '''
+    Find broken relative links in all markdown files in the course directory.
+
+    Args:
+        course_dir (str | Path): Path to the course directory.
+
+    Returns:
+        list[str]: A list of error messages for broken links.
+    '''
+    dir_path = Path(course_dir)
+    errors: list[str] = []
+
+    # Находим все Markdown-файлы рекурсивно
+    md_files = list(dir_path.rglob('*.md'))
+
+    for md_file in md_files:
+        try:
+            with open(md_file, 'r', encoding='utf-8') as f:
+                for line_num, line in enumerate(f, 1):
+                    for link in LINK_REGEX.findall(line):
+                        # Отсекаем query-параметры и хэш-фрагменты
+                        clean_link = link.split('#')[0].split('?')[0].strip()
+
+                        # Игнорируем внешние ссылки
+                        if any(clean_link.lower().startswith(proto) for proto in ('http://', 'https://', 'mailto:', 'ftp://', 'tel:')):
+                            continue
+
+                        # Игнорируем ссылки, которые ссылаются только на якорь или пусты
+                        if link.strip().startswith('#') or not clean_link:
+                            continue
+
+                        # Определяем полный путь к целевому файлу
+                        if clean_link.startswith('/') or clean_link.startswith('\\'):
+                            # Относительно корня курса
+                            target_path = dir_path / clean_link.lstrip('/\\')
+                        else:
+                            # Относительно текущего файла
+                            target_path = (md_file.parent / clean_link).resolve()
+
+                        # Проверяем существование файла/папки
+                        if not target_path.exists():
+                            # Вычисляем относительный путь для красивого вывода
+                            try:
+                                rel_md = md_file.relative_to(dir_path)
+                            except ValueError:
+                                rel_md = md_file
+
+                            try:
+                                rel_target = target_path.relative_to(dir_path) if target_path.is_relative_to(dir_path) else target_path
+                            except ValueError:
+                                rel_target = target_path
+
+                            errors.append(
+                                f'Битая ссылка в {rel_md}:{line_num}: "{link}" (файл не найден: {rel_target})'
+                            )
+        except Exception as e:
+            try:
+                rel_md = md_file.relative_to(dir_path)
+            except ValueError:
+                rel_md = md_file
+            errors.append(f'Ошибка при анализе файла {rel_md}: {e}')
+
+    return errors
+
+
+
 if __name__ == '__main__':
     # Берем путь из аргументов или используем папку по умолчанию
     target_dir = sys.argv[1] if len(sys.argv) > 1 else './test_courses/invalid_course'
