@@ -40,6 +40,10 @@ def init_course_structure(title: str, target_dir: str | Path) -> dict[str, Any]:
         with open(index_path, 'w', encoding='utf-8') as f:
             f.write(f"# {title}\n\nДобро пожаловать в курс! Здесь будет описание.\n")
 
+    hooks_dir = base_path / '.githooks'
+    hooks_dir.mkdir(exist_ok=True)
+    
+    hook_path = hooks_dir / 'pre-commit'
     return {
         'is_success': True,
         'message': f"Структура курса успешно создана в '{base_path.resolve()}'"
