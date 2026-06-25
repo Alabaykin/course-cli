@@ -132,6 +132,44 @@ def find_broken_links(course_dir: str | Path) -> list[str]:
     return errors
 
 
+def validate_course_structure(course_dir: str | Path) -> dict[str, Any]:
+    '''
+    Validate course structure including metadata (course.yaml), existence of index.md,
+    and correctness of relative markdown links.
+
+    Args:
+        course_dir (str | Path): Path to the course directory.
+
+    Returns:
+        dict[str, Any]: Validation report with keys 'is_valid' and 'errors'.
+    '''
+    dir_path = Path(course_dir)
+    errors: list[str] = []
+
+    # 1. Валидация метаданных (course.yaml)
+    metadata_report = validate_course_metadata(dir_path)
+    if not metadata_report['is_valid']:
+        errors.extend(metadata_report['errors'])
+
+    # 2. Проверка наличия корневого файла index.md
+    index_path = dir_path / 'index.md'
+    if not index_path.exists():
+        errors.append("Отсутствует корневой файл 'index.md'")
+    elif not index_path.is_file():
+        errors.append("Путь 'index.md' существует, но не является файлом")
+
+    # 3. Поиск битых ссылок в Markdown-файлах
+    if dir_path.exists() and dir_path.is_dir():
+        broken_links_errors = find_broken_links(dir_path)
+        errors.extend(broken_links_errors)
+
+    return {
+        'is_valid': len(errors) == 0,
+        'errors': errors,
+    }
+
+
+
 
 if __name__ == '__main__':
     # Берем путь из аргументов или используем папку по умолчанию
