@@ -46,10 +46,32 @@ def init_course_structure(title: str, target_dir: str | Path) -> dict[str, Any]:
     hook_path = hooks_dir / 'pre-commit'
     hook_script = '''#!/usr/bin/env bash
 
+RED='\\033[0;31m'
+GREEN='\\033[0;32m'
+NC='\\033[0m' # No Color
 
 echo "Очередь pre-commit: Запуск Course CLI валидации..."
 
+STASH_CREATED=0
+if ! git diff --quiet; then
+    git stash push -q --keep-index -m "course-cli-pre-commit-stash"
+    STASH_CREATED=1
+fi
+
 course-cli validate .
+RESULT=$?
+
+if [ $STASH_CREATED -eq 1 ]; then
+    git stash pop -q
+fi
+
+if [ $RESULT -ne 0 ]; then
+    echo -e "${RED}❌ Коммит отклонен: Найдены ошибки в структуре курса или course.yaml.${NC}"
+    echo -e "${RED}Пожалуйста, исправьте ошибки, добавьте файлы через 'git add' и попробуйте снова.${NC}"
+    exit 1
+fi
+
+echo -e "${GREEN}✅ Валидация успешно пройдена. Коммит разрешен.${NC}"
 exit 0
 '''
     return {
