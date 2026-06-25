@@ -172,6 +172,10 @@ def validate_course_structure(course_dir: str | Path) -> dict[str, Any]:
 
 
 if __name__ == '__main__':
+    # Настройка кодировки для корректного вывода emoji на Windows
+    if sys.platform == 'win32':
+        sys.stdout.reconfigure(encoding='utf-8')
+
     # Берем путь из аргументов или используем папку по умолчанию
     target_dir = sys.argv[1] if len(sys.argv) > 1 else './test_courses/invalid_course'
 
