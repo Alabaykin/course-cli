@@ -21,7 +21,6 @@ $(VENV):
 setup: $(VENV)
 	$(PIP) install --upgrade pip
 	$(PIP) install -e .
-
 test: setup
 	$(PYTHON) -m pytest tests/
 
