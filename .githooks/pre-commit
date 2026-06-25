@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+
+
+echo "Очередь pre-commit: Запуск Course CLI валидации..."
+
+
+# Активируем виртуальное окружение
+if [ -f "./venv/bin/activate" ]; then
+    source ./venv/bin/activate
+fi
+
+# Запускаем валидацию
+course-cli validate .
+RESULT=$?
