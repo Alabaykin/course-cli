@@ -103,6 +103,33 @@ def test_find_broken_links_no_markdown(tmp_path: Path) -> None:
     assert len(errors) == 0
 
 
+def test_find_broken_links_valid_links(tmp_path: Path) -> None:
+    """
+    Test find_broken_links when links are valid (exist, external, anchor-only, or empty).
+    """
+    from course_cli.validate import find_broken_links
+    
+    # Create target files
+    (tmp_path / 'lesson1.md').write_text("Lesson content", encoding='utf-8')
+    (tmp_path / 'img').mkdir()
+    (tmp_path / 'img' / 'pic.png').write_text("", encoding='utf-8')
+    
+    # Create indexing markdown with valid links
+    index_md = tmp_path / 'index.md'
+    index_md.write_text(
+        "Link to [Lesson 1](lesson1.md)\n"
+        "Link to [Pic](img/pic.png)\n"
+        "Link to [External](https://google.com)\n"
+        "Link to [Anchor](#anchor-link)\n"
+        "Link to [Empty]()\n",
+        encoding='utf-8'
+    )
+    
+    errors = find_broken_links(tmp_path)
+    assert len(errors) == 0
+
+
+
 
 
 
