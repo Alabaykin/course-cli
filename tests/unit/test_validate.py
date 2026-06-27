@@ -187,6 +187,25 @@ def test_structure_missing_index(tmp_path: Path) -> None:
     assert "Отсутствует корневой файл 'index.md'" in report['errors']
 
 
+def test_structure_index_is_directory(tmp_path: Path) -> None:
+    """
+    Test validate_course_structure when index.md is a directory instead of a file.
+    """
+    from course_cli.validate import validate_course_structure
+    
+    # Create valid course.yaml
+    yaml_file = tmp_path / 'course.yaml'
+    yaml_file.write_text("title: My Course\noutcomes:\n- Outcome 1\n", encoding='utf-8')
+    
+    # Create index.md as directory
+    (tmp_path / 'index.md').mkdir()
+    
+    report = validate_course_structure(tmp_path)
+    assert not report['is_valid']
+    assert "Путь 'index.md' существует, но не является файлом" in report['errors']
+
+
+
 
 
 
