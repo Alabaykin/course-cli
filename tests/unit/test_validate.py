@@ -38,3 +38,23 @@ def test_metadata_empty_file(tmp_path: Path) -> None:
     assert 'Файл course.yaml пуст.' in report['errors']
 
 
+def test_metadata_missing_title(tmp_path: Path) -> None:
+    """
+    Test validate_course_metadata when course.yaml misses 'title' or it is empty.
+    """
+    yaml_file = tmp_path / 'course.yaml'
+    
+    # Outcomes is present, but title is missing
+    yaml_file.write_text("outcomes:\n- Outcome 1\n", encoding='utf-8')
+    report = validate_course_metadata(tmp_path)
+    assert not report['is_valid']
+    assert "Отсутствует обязательное поле: 'title'" in report['errors']
+    
+    # Title is empty string
+    yaml_file.write_text("title: ''\noutcomes:\n- Outcome 1\n", encoding='utf-8')
+    report = validate_course_metadata(tmp_path)
+    assert not report['is_valid']
+    assert "Отсутствует обязательное поле: 'title'" in report['errors']
+
+
+
