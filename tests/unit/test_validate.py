@@ -25,3 +25,16 @@ def test_metadata_invalid_yaml(tmp_path: Path) -> None:
     assert not report['is_valid']
     assert any('Ошибка парсинга YAML' in err for err in report['errors'])
 
+
+def test_metadata_empty_file(tmp_path: Path) -> None:
+    """
+    Test validate_course_metadata when course.yaml exists but is empty.
+    """
+    yaml_file = tmp_path / 'course.yaml'
+    yaml_file.write_text("", encoding='utf-8')
+    
+    report = validate_course_metadata(tmp_path)
+    assert not report['is_valid']
+    assert 'Файл course.yaml пуст.' in report['errors']
+
+
