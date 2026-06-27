@@ -205,6 +205,30 @@ def test_structure_index_is_directory(tmp_path: Path) -> None:
     assert "Путь 'index.md' существует, но не является файлом" in report['errors']
 
 
+def test_structure_fully_valid(tmp_path: Path) -> None:
+    """
+    Test validate_course_structure when the course structure, metadata, and links are valid.
+    """
+    from course_cli.validate import validate_course_structure
+    
+    # 1. Create valid course.yaml
+    yaml_file = tmp_path / 'course.yaml'
+    yaml_file.write_text("title: Valid Course\noutcomes:\n- Learn testing\n", encoding='utf-8')
+    
+    # 2. Create index.md
+    index_file = tmp_path / 'index.md'
+    index_file.write_text("Welcome to the course. [Go to details](details.md)", encoding='utf-8')
+    
+    # 3. Create details.md
+    details_file = tmp_path / 'details.md'
+    details_file.write_text("Here are details. [Back](index.md)", encoding='utf-8')
+    
+    report = validate_course_structure(tmp_path)
+    assert report['is_valid']
+    assert len(report['errors']) == 0
+
+
+
 
 
 
