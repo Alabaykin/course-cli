@@ -149,6 +149,30 @@ def test_find_broken_links_with_broken(tmp_path: Path) -> None:
     assert any('missing_root.png' in err for err in errors)
 
 
+def test_find_broken_links_read_error(tmp_path: Path, mocker) -> None:
+    """
+    Test find_broken_links handles exceptions when opening markdown files.
+    """
+    from course_cli.validate import find_broken_links
+    
+    md_file = tmp_path / 'broken.md'
+    md_file.write_text("Some text", encoding='utf-8')
+    
+    # Mock open to raise PermissionError when opening broken.md
+    original_open = open
+    def mock_open(file, *args, **kwargs):
+        if Path(file).name == 'broken.md':
+            raise PermissionError("Permission denied")
+        return original_open(file, *args, **kwargs)
+        
+    mocker.patch('builtins.open', mock_open)
+    
+    errors = find_broken_links(tmp_path)
+    assert len(errors) == 1
+    assert 'Ошибка при анализе файла broken.md' in errors[0]
+
+
+
 
 
 
