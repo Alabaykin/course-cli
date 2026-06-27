@@ -20,9 +20,13 @@ def init_course_structure(title: str, target_dir: str | Path) -> dict[str, Any]:
     yaml_path = base_path / 'course.yaml'
     metadata = {
         'title': title,
+        'description': 'Краткое описание курса (замените на свое)',
         'outcomes': [
             "Пример результата 1 (замените на свой)",
             "Пример результата 2 (замените на свой)"
+        ],
+        'competencies': [
+            "comp-example-01 (замените на реальный ID из Skill-matrix)"
         ],
         'skills': []
     }
