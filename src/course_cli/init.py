@@ -16,6 +16,12 @@ def init_course_structure(title: str, target_dir: str | Path) -> dict[str, Any]:
     for d in directories:
         (base_path / d).mkdir(parents=True, exist_ok=True)
 
+    # Создаем шаблон первого урока
+    lesson_path = base_path / 'modules' / 'module_1' / 'lesson_1.md'
+    if not lesson_path.exists():
+        with open(lesson_path, 'w', encoding='utf-8') as f:
+            f.write(f"# Урок 1: Введение\n\nЗдесь будет текст первого урока для курса '{title}'.\n")
+
     # Генерируем метаданные для course.yaml
     yaml_path = base_path / 'course.yaml'
     metadata = {
