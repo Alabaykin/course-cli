@@ -22,6 +22,12 @@ def init_course_structure(title: str, target_dir: str | Path) -> dict[str, Any]:
         with open(lesson_path, 'w', encoding='utf-8') as f:
             f.write(f"# Урок 1: Введение\n\nЗдесь будет текст первого урока для курса '{title}'.\n")
 
+    # Создаем шаблон проверочного задания
+    task_path = base_path / 'assessments' / 'task_1.md'
+    if not task_path.exists():
+        with open(task_path, 'w', encoding='utf-8') as f:
+            f.write("# Практическое задание 1\n\nОписание задания и критерии оценки.\n")
+
     # Генерируем метаданные для course.yaml
     yaml_path = base_path / 'course.yaml'
     metadata = {
