@@ -20,10 +20,13 @@ def main():
     pass
 
 @main.command()
-@click.argument('title')
+@click.argument('title', required=False)
 @click.option('--dir', '-d', 'target_dir', default='.', type=click.Path(), help='Папка для создания курса')
 def init(title, target_dir):
     """Инициализация структуры нового курса."""
+    if not title:
+        title = click.prompt("Введите название курса")
+        
     click.echo(f"Создание курса: '{title}'...")
     
     # Вызов бизнес-логики
