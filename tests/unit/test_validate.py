@@ -57,4 +57,30 @@ def test_metadata_missing_title(tmp_path: Path) -> None:
     assert "Отсутствует обязательное поле: 'title'" in report['errors']
 
 
+def test_metadata_missing_outcomes(tmp_path: Path) -> None:
+    """
+    Test validate_course_metadata when course.yaml misses 'outcomes', is empty or not a list.
+    """
+    yaml_file = tmp_path / 'course.yaml'
+    
+    # outcomes is completely missing
+    yaml_file.write_text("title: My Course\n", encoding='utf-8')
+    report = validate_course_metadata(tmp_path)
+    assert not report['is_valid']
+    assert "Отсутствует или пуст список учебных результатов: 'outcomes'" in report['errors']
+    
+    # outcomes is not a list (e.g. a string)
+    yaml_file.write_text("title: My Course\noutcomes: not-a-list\n", encoding='utf-8')
+    report = validate_course_metadata(tmp_path)
+    assert not report['is_valid']
+    assert "Отсутствует или пуст список учебных результатов: 'outcomes'" in report['errors']
+    
+    # outcomes is an empty list
+    yaml_file.write_text("title: My Course\noutcomes: []\n", encoding='utf-8')
+    report = validate_course_metadata(tmp_path)
+    assert not report['is_valid']
+    assert "Отсутствует или пуст список учебных результатов: 'outcomes'" in report['errors']
+
+
+
 
