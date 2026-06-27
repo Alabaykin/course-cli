@@ -11,10 +11,22 @@ def init_course_structure(title: str, target_dir: str | Path) -> dict[str, Any]:
     """
     base_path = Path(target_dir)
 
-    # Создаем корневые папки
-    directories = ['modules', 'lessons']
+    # Создаем корневые папки и шаблоны уроков/заданий
+    directories = ['modules/module_1', 'lessons', 'assessments']
     for d in directories:
         (base_path / d).mkdir(parents=True, exist_ok=True)
+
+    # Создаем шаблон первого урока
+    lesson_path = base_path / 'modules' / 'module_1' / 'lesson_1.md'
+    if not lesson_path.exists():
+        with open(lesson_path, 'w', encoding='utf-8') as f:
+            f.write(f"# Урок 1: Введение\n\nЗдесь будет текст первого урока для курса '{title}'.\n")
+
+    # Создаем шаблон проверочного задания
+    task_path = base_path / 'assessments' / 'task_1.md'
+    if not task_path.exists():
+        with open(task_path, 'w', encoding='utf-8') as f:
+            f.write("# Практическое задание 1\n\nОписание задания и критерии оценки.\n")
 
     # Генерируем метаданные для course.yaml
     yaml_path = base_path / 'course.yaml'
