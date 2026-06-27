@@ -129,6 +129,27 @@ def test_find_broken_links_valid_links(tmp_path: Path) -> None:
     assert len(errors) == 0
 
 
+def test_find_broken_links_with_broken(tmp_path: Path) -> None:
+    """
+    Test find_broken_links when broken relative links are present.
+    """
+    from course_cli.validate import find_broken_links
+    
+    # Create indexing markdown with broken links
+    index_md = tmp_path / 'index.md'
+    index_md.write_text(
+        "Link to [Missing Lesson](lessons/missing.md)\n"
+        "Link to [Absolute Missing Root](/missing_root.png)\n",
+        encoding='utf-8'
+    )
+    
+    errors = find_broken_links(tmp_path)
+    assert len(errors) == 2
+    assert any('lessons/missing.md' in err or 'lessons\\missing.md' in err for err in errors)
+    assert any('missing_root.png' in err for err in errors)
+
+
+
 
 
 
