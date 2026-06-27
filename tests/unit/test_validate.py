@@ -172,6 +172,22 @@ def test_find_broken_links_read_error(tmp_path: Path, mocker) -> None:
     assert 'Ошибка при анализе файла broken.md' in errors[0]
 
 
+def test_structure_missing_index(tmp_path: Path) -> None:
+    """
+    Test validate_course_structure when index.md is missing.
+    """
+    from course_cli.validate import validate_course_structure
+    
+    # Create valid course.yaml
+    yaml_file = tmp_path / 'course.yaml'
+    yaml_file.write_text("title: My Course\noutcomes:\n- Outcome 1\n", encoding='utf-8')
+    
+    report = validate_course_structure(tmp_path)
+    assert not report['is_valid']
+    assert "Отсутствует корневой файл 'index.md'" in report['errors']
+
+
+
 
 
 
