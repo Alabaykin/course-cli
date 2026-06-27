@@ -82,5 +82,18 @@ def test_metadata_missing_outcomes(tmp_path: Path) -> None:
     assert "Отсутствует или пуст список учебных результатов: 'outcomes'" in report['errors']
 
 
+def test_metadata_valid(tmp_path: Path) -> None:
+    """
+    Test validate_course_metadata with valid course.yaml file.
+    """
+    yaml_file = tmp_path / 'course.yaml'
+    yaml_file.write_text("title: My Course\noutcomes:\n- Outcome 1\n- Outcome 2\n", encoding='utf-8')
+    
+    report = validate_course_metadata(tmp_path)
+    assert report['is_valid']
+    assert len(report['errors']) == 0
+
+
+
 
 
