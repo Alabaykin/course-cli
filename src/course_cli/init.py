@@ -11,8 +11,8 @@ def init_course_structure(title: str, target_dir: str | Path) -> dict[str, Any]:
     """
     base_path = Path(target_dir)
 
-    # Создаем корневые папки
-    directories = ['modules', 'lessons']
+    # Создаем корневые папки и шаблоны уроков/заданий
+    directories = ['modules/module_1', 'lessons', 'assessments']
     for d in directories:
         (base_path / d).mkdir(parents=True, exist_ok=True)
 
