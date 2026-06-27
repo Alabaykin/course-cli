@@ -94,6 +94,16 @@ def test_metadata_valid(tmp_path: Path) -> None:
     assert len(report['errors']) == 0
 
 
+def test_find_broken_links_no_markdown(tmp_path: Path) -> None:
+    """
+    Test find_broken_links when no markdown files exist in the course directory.
+    """
+    from course_cli.validate import find_broken_links
+    errors = find_broken_links(tmp_path)
+    assert len(errors) == 0
+
+
+
 
 
 
