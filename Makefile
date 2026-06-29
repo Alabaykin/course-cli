@@ -4,13 +4,14 @@ PYTHON_SYS = python3
 PYTHON = $(VENV_BIN)/python
 PIP = $(VENV_BIN)/pip
 
-.PHONY: help setup test demo clean
+.PHONY: help setup test demo clean run-cli
 
 .DEFAULT_GOAL := help
 
 help:
 	@echo "Доступные команды Course CLI:"
 	@echo "  setup    Подготовить виртуальное окружение и установить CLI-утилиту"
+	@echo "  run-cli  Запустить Course CLI (вывод справки)"
 	@echo "  test     Запустить тесты (pytest)"
 	@echo "  demo     Создать временный курс для проверки работы команды init"
 	@echo "  clean    Очистить кэши, виртуальное окружение и временные файлы"
@@ -33,3 +34,7 @@ demo: setup
 
 clean:
 	rm -rf $(VENV) .pytest_cache temp_demo *.egg-info course_cli.egg-info src/course_cli.egg-info
+
+
+run-cli: setup
+	$(VENV_BIN)/course-cli --help
