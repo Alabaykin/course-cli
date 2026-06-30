@@ -148,6 +148,7 @@ def report(course_dir):
                 'https://example.edu/xapi/extensions/uncovered-outcomes': o_stats['uncovered_outcomes'],
                 'https://example.edu/xapi/extensions/coverage-percentage': o_stats['coverage_percentage'],
                 'https://example.edu/xapi/extensions/is-valid': report_data['is_valid'],
+                'https://example.edu/xapi/extensions/competencies': report_data.get('competencies', []),
             }
             stmt = generate_xapi_statement(
                 verb_id='http://activitystrea.ms/schema/1.0/progress',
