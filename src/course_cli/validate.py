@@ -57,6 +57,9 @@ def validate_course_metadata(course_dir: str | Path) -> dict[str, Any]:
     if 'title' not in data or not data['title']:
         errors.append("Отсутствует обязательное поле: 'title'")
 
+    if 'description' not in data or not data['description']:
+        errors.append("Отсутствует обязательное поле: 'description'")
+
     if 'outcomes' not in data or not isinstance(data['outcomes'], list) or len(data['outcomes']) == 0:
         errors.append("Отсутствует или пуст список учебных результатов: 'outcomes'")
 
