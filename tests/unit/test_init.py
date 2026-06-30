@@ -1,0 +1,45 @@
+import os
+import yaml
+from pathlib import Path
+from unittest.mock import patch, call
+import pytest
+from course_cli.init import init_course_structure
+
+@pytest.mark.parametrize("title, expected_title", [
+    ("Python Basics", "Python Basics"),
+    ("Advanced C++ (2026)", "Advanced C++ (2026)"),
+    ("12345", "12345"),
+])
+def test_init_creates_directories_and_templates(tmp_path: Path, title: str, expected_title: str) -> None:
+    """
+    Проверяет создание всех необходимых директорий и заполнение шаблонов файлов.
+    Соответствует принципу атомарности и кластеризации входных данных.
+    """
+    result = init_course_structure(title, tmp_path)
+    
+    assert result['is_success'] is True
+    
+    # 1. Проверка структуры директорий
+    assert (tmp_path / 'modules' / 'module_1').is_dir()
+    assert (tmp_path / 'lessons').is_dir()
+    assert (tmp_path / 'assessments').is_dir()
+    assert (tmp_path / '.githooks').is_dir()
+    
+    # 2. Проверка контентных шаблонов
+    lesson_path = tmp_path / 'modules' / 'module_1' / 'lesson_1.md'
+    assert lesson_path.is_file()
+    assert expected_title in lesson_path.read_text(encoding='utf-8')
+    
+    task_path = tmp_path / 'assessments' / 'task_1.md'
+    assert task_path.is_file()
+    assert "Практическое задание 1" in task_path.read_text(encoding='utf-8')
+    
+    index_path = tmp_path / 'index.md'
+    assert index_path.is_file()
+    assert f"# {expected_title}" in index_path.read_text(encoding='utf-8')
+    
+    # 3. Проверка pre-commit хука
+    hook_path = tmp_path / '.githooks' / 'pre-commit'
+    assert hook_path.is_file()
+    assert "course-cli validate" in hook_path.read_text(encoding='utf-8')
+    assert os.access(hook_path, os.X_OK)
