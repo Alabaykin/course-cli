@@ -49,6 +49,7 @@ def generate_report(course_dir: str | Path) -> dict[str, Any]:
     # 3. Чтение метаданных курса из course.yaml
     course_title = dir_path.name
     outcomes: list[str] = []
+    competencies: list[str] = []
     
     yaml_path = dir_path / 'course.yaml'
     if yaml_path.exists() and yaml_path.is_file():
@@ -60,6 +61,10 @@ def generate_report(course_dir: str | Path) -> dict[str, Any]:
                         course_title = data['title']
                     if 'outcomes' in data and isinstance(data['outcomes'], list):
                         outcomes = [str(o).strip() for o in data['outcomes'] if o]
+                    if 'competencies' in data and isinstance(data['competencies'], list):
+                        competencies.extend([str(c).strip() for c in data['competencies'] if c])
+                    if 'skills' in data and isinstance(data['skills'], list):
+                        competencies.extend([str(s).strip() for s in data['skills'] if s])
         except Exception:
             pass
 
@@ -110,5 +115,6 @@ def generate_report(course_dir: str | Path) -> dict[str, Any]:
             'covered_outcomes': covered_outcomes,
             'uncovered_outcomes': uncovered_outcomes,
             'coverage_percentage': round(coverage_percentage, 2),
-        }
+        },
+        'competencies': competencies
     }
