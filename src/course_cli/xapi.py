@@ -102,8 +102,14 @@ def generate_xapi_statement(
         'timestamp': timestamp
     }
 
-    if extensions:
-        statement['result']['extensions'] = extensions
+    if not extensions:
+        extensions = {}
+        
+    extensions['https://example.edu/xapi/extensions/evidenceLinks'] = [
+        "https://example.edu/evidence/placeholder"
+    ]
+    
+    statement['result']['extensions'] = extensions
 
     return statement
 
