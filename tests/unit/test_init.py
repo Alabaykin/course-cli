@@ -63,3 +63,17 @@ def test_init_generates_valid_course_yaml(tmp_path: Path) -> None:
     assert 'competencies' in data
     assert 'skills' in data
 
+@patch('course_cli.init.subprocess.run')
+def test_init_git_integration_success(mock_run, tmp_path: Path) -> None:
+    """
+    Проверяет Happy Path: вызов системных git команд при отсутствии репозитория.
+    Использует мокирование для избежания запуска реального git процесса.
+    """
+    init_course_structure("Git Test", tmp_path)
+    
+    expected_calls = [
+        call(['git', 'init'], cwd=str(tmp_path), check=True, capture_output=True),
+        call(['git', 'config', 'core.hooksPath', '.githooks'], cwd=str(tmp_path), check=True, capture_output=True)
+    ]
+    mock_run.assert_has_calls(expected_calls, any_order=True)
+
