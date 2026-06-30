@@ -79,3 +79,17 @@ def test_cli_report_privacy_gate_decline(mock_send, mock_report, runner):
     
     # Гарантируем, что данные не утекли
     mock_send.assert_not_called()
+
+@patch('course_cli.cli.validate_course_structure')
+@patch('course_cli.cli.generate_xapi_statement')
+@patch('course_cli.cli.send_xapi_statement')
+def test_cli_validate_success(mock_send, mock_gen, mock_val, runner):
+    """Проверка Happy Path: команда validate при успешной валидации."""
+    mock_val.return_value = {'is_valid': True, 'errors': []}
+    
+    result = runner.invoke(main, ['validate'])
+    
+    assert result.exit_code == 0
+    assert "Курс валиден!" in result.output
+    mock_gen.assert_called_once()
+    mock_send.assert_called_once()
