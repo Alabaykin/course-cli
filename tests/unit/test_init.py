@@ -43,3 +43,23 @@ def test_init_creates_directories_and_templates(tmp_path: Path, title: str, expe
     assert hook_path.is_file()
     assert "course-cli validate" in hook_path.read_text(encoding='utf-8')
     assert os.access(hook_path, os.X_OK)
+
+def test_init_generates_valid_course_yaml(tmp_path: Path) -> None:
+    """
+    Проверяет, что генерируется валидный YAML файл со всеми требуемыми ключами.
+    """
+    title = "YAML Test Course"
+    init_course_structure(title, tmp_path)
+    
+    yaml_path = tmp_path / 'course.yaml'
+    assert yaml_path.is_file()
+    
+    with open(yaml_path, 'r', encoding='utf-8') as f:
+        data = yaml.safe_load(f)
+        
+    assert data['title'] == title
+    assert 'description' in data
+    assert 'outcomes' in data
+    assert 'competencies' in data
+    assert 'skills' in data
+
