@@ -23,6 +23,7 @@ setup: $(VENV)
 	$(PIP) install --upgrade pip
 	$(PIP) install -e .
 test: setup
+	$(PIP) install pytest pytest-mock
 	$(PYTHON) -m pytest tests/
 
 demo: setup
