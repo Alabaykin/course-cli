@@ -77,3 +77,16 @@ def test_init_git_integration_success(mock_run, tmp_path: Path) -> None:
     ]
     mock_run.assert_has_calls(expected_calls, any_order=True)
 
+@patch('course_cli.init.subprocess.run')
+def test_init_skips_git_init_if_exists(mock_run, tmp_path: Path) -> None:
+    """
+    Проверяет кластер эквивалентности: git репозиторий уже существует (Error path / Edge case).
+    Функция git init не должна вызываться повторно, но hooksPath должен настраиваться.
+    """
+    (tmp_path / '.git').mkdir()
+    
+    init_course_structure("Git Exists Test", tmp_path)
+    
+    mock_run.assert_called_once_with(
+        ['git', 'config', 'core.hooksPath', '.githooks'], cwd=str(tmp_path), check=True, capture_output=True
+    )
