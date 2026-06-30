@@ -107,3 +107,25 @@ def test_cli_validate_failure(mock_send, mock_val, runner):
     assert "Ошибка 1" in result.output
     assert "Ошибка 2" in result.output
     mock_send.assert_not_called()
+
+@patch('course_cli.cli.generate_report')
+@patch('course_cli.cli.generate_xapi_statement')
+@patch('course_cli.cli.send_xapi_statement')
+def test_cli_report_privacy_gate_accept(mock_send, mock_gen, mock_report, runner):
+    """Проверка Happy Path: команда report с согласием на отправку в LRS."""
+    mock_report.return_value = {
+        'course_title': 'Privacy Course',
+        'is_valid': True,
+        'validation_errors': [],
+        'files_stats': {'total_markdown_files': 1, 'total_files': 1, 'total_directories': 1},
+        'outcomes_stats': {'total_outcomes': 1, 'covered_outcomes': [], 'uncovered_outcomes': [], 'coverage_percentage': 0.0}
+    }
+    
+    # Имитируем согласие пользователя (y)
+    result = runner.invoke(main, ['report'], input='y\n')
+    
+    assert result.exit_code == 0
+    assert "Результаты успешно отправлены в LRS" in result.output
+    mock_gen.assert_called_once()
+    mock_send.assert_called_once()
+
