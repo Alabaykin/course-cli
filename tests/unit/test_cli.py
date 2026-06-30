@@ -129,3 +129,12 @@ def test_cli_report_privacy_gate_accept(mock_send, mock_gen, mock_report, runner
     mock_gen.assert_called_once()
     mock_send.assert_called_once()
 
+@patch('course_cli.cli.generate_report')
+def test_cli_report_exception_handling(mock_report, runner):
+    """Проверка Error Path: обработка исключений внутри бизнес-логики."""
+    mock_report.side_effect = Exception("Internal Error XYZ")
+    
+    result = runner.invoke(main, ['report'])
+    
+    assert result.exit_code == 1
+    assert "Произошла ошибка при анализе курса: Internal Error XYZ" in result.output
