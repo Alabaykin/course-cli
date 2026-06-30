@@ -93,3 +93,17 @@ def test_cli_validate_success(mock_send, mock_gen, mock_val, runner):
     assert "Курс валиден!" in result.output
     mock_gen.assert_called_once()
     mock_send.assert_called_once()
+
+@patch('course_cli.cli.validate_course_structure')
+@patch('course_cli.cli.send_xapi_statement')
+def test_cli_validate_failure(mock_send, mock_val, runner):
+    """Проверка Error Path: команда validate при наличии ошибок."""
+    mock_val.return_value = {'is_valid': False, 'errors': ['Ошибка 1', 'Ошибка 2']}
+    
+    result = runner.invoke(main, ['validate'])
+    
+    assert result.exit_code == 1
+    assert "Найдены ошибки:" in result.output
+    assert "Ошибка 1" in result.output
+    assert "Ошибка 2" in result.output
+    mock_send.assert_not_called()
