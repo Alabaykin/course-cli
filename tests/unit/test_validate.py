@@ -57,6 +57,18 @@ def test_metadata_missing_title(tmp_path: Path) -> None:
     assert "Отсутствует обязательное поле: 'title'" in report['errors']
 
 
+def test_metadata_missing_description(tmp_path: Path) -> None:
+    """
+    Test validate_course_metadata when course.yaml misses 'description'.
+    """
+    yaml_file = tmp_path / 'course.yaml'
+    
+    yaml_file.write_text("title: My Course\noutcomes:\n- Outcome 1\n", encoding='utf-8')
+    report = validate_course_metadata(tmp_path)
+    assert not report['is_valid']
+    assert "Отсутствует обязательное поле: 'description'" in report['errors']
+
+
 def test_metadata_missing_outcomes(tmp_path: Path) -> None:
     """
     Test validate_course_metadata when course.yaml misses 'outcomes', is empty or not a list.
@@ -87,7 +99,7 @@ def test_metadata_valid(tmp_path: Path) -> None:
     Test validate_course_metadata with valid course.yaml file.
     """
     yaml_file = tmp_path / 'course.yaml'
-    yaml_file.write_text("title: My Course\noutcomes:\n- Outcome 1\n- Outcome 2\n", encoding='utf-8')
+    yaml_file.write_text("title: My Course\ndescription: Some desc\noutcomes:\n- Outcome 1\n- Outcome 2\n", encoding='utf-8')
     
     report = validate_course_metadata(tmp_path)
     assert report['is_valid']
@@ -213,7 +225,7 @@ def test_structure_fully_valid(tmp_path: Path) -> None:
     
     # 1. Create valid course.yaml
     yaml_file = tmp_path / 'course.yaml'
-    yaml_file.write_text("title: Valid Course\noutcomes:\n- Learn testing\n", encoding='utf-8')
+    yaml_file.write_text("title: Valid Course\ndescription: Test\noutcomes:\n- Learn testing\n", encoding='utf-8')
     
     # 2. Create index.md
     index_file = tmp_path / 'index.md'
