@@ -55,3 +55,27 @@ def test_cli_init_interactive_fallback(mock_send, mock_gen, mock_init, runner):
     assert "Создание курса: 'Interactive Course'..." in result.output
     mock_init.assert_called_once_with('Interactive Course', '.')
 
+@patch('course_cli.cli.generate_report')
+@patch('course_cli.cli.send_xapi_statement')
+def test_cli_report_privacy_gate_decline(mock_send, mock_report, runner):
+    """
+    Проверка шлюза приватности (Privacy Gate): команда report с отказом от отправки в LRS.
+    Убеждаемся, что при вводе 'n' (No) функция сетевой отправки НЕ вызывается (Error path/Opt-out).
+    """
+    mock_report.return_value = {
+        'course_title': 'Privacy Course',
+        'is_valid': True,
+        'validation_errors': [],
+        'files_stats': {'total_markdown_files': 1, 'total_files': 1, 'total_directories': 1},
+        'outcomes_stats': {'total_outcomes': 1, 'covered_outcomes': [], 'uncovered_outcomes': [], 'coverage_percentage': 0.0}
+    }
+    
+    # Имитируем отказ пользователя (n)
+    result = runner.invoke(main, ['report'], input='n\n')
+    
+    assert result.exit_code == 0
+    assert 'Отправить результаты в LRS?' in result.output
+    assert 'Отправка в LRS отменена пользователем.' in result.output
+    
+    # Гарантируем, что данные не утекли
+    mock_send.assert_not_called()
