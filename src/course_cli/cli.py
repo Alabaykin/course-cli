@@ -137,25 +137,29 @@ def report(course_dir):
             click.secho(f"    [-] {o}", fg='red')
             
     # Отправка события xAPI
-    try:
-        extensions = {
-            'https://example.edu/xapi/extensions/total-files': report_data['files_stats']['total_files'],
-            'https://example.edu/xapi/extensions/total-markdown-files': report_data['files_stats']['total_markdown_files'],
-            'https://example.edu/xapi/extensions/total-directories': report_data['files_stats']['total_directories'],
-            'https://example.edu/xapi/extensions/total-outcomes': o_stats['total_outcomes'],
-            'https://example.edu/xapi/extensions/covered-outcomes': o_stats['covered_outcomes'],
-            'https://example.edu/xapi/extensions/uncovered-outcomes': o_stats['uncovered_outcomes'],
-            'https://example.edu/xapi/extensions/coverage-percentage': o_stats['coverage_percentage'],
-            'https://example.edu/xapi/extensions/is-valid': report_data['is_valid'],
-        }
-        stmt = generate_xapi_statement(
-            verb_id='http://activitystrea.ms/schema/1.0/progress',
-            verb_display='сформировал отчет',
-            course_title=report_data['course_title'],
-            course_path=course_dir,
-            success=report_data['is_valid'],
-            extensions=extensions
-        )
-        send_xapi_statement(stmt)
-    except Exception as e:
-        click.echo(f"Предупреждение: не удалось залогировать xAPI событие: {e}", err=True)
+    if click.confirm("\nОтправить результаты в LRS?"):
+        try:
+            extensions = {
+                'https://example.edu/xapi/extensions/total-files': report_data['files_stats']['total_files'],
+                'https://example.edu/xapi/extensions/total-markdown-files': report_data['files_stats']['total_markdown_files'],
+                'https://example.edu/xapi/extensions/total-directories': report_data['files_stats']['total_directories'],
+                'https://example.edu/xapi/extensions/total-outcomes': o_stats['total_outcomes'],
+                'https://example.edu/xapi/extensions/covered-outcomes': o_stats['covered_outcomes'],
+                'https://example.edu/xapi/extensions/uncovered-outcomes': o_stats['uncovered_outcomes'],
+                'https://example.edu/xapi/extensions/coverage-percentage': o_stats['coverage_percentage'],
+                'https://example.edu/xapi/extensions/is-valid': report_data['is_valid'],
+            }
+            stmt = generate_xapi_statement(
+                verb_id='http://activitystrea.ms/schema/1.0/progress',
+                verb_display='сформировал отчет',
+                course_title=report_data['course_title'],
+                course_path=course_dir,
+                success=report_data['is_valid'],
+                extensions=extensions
+            )
+            send_xapi_statement(stmt)
+            click.secho("✅ Результаты успешно отправлены в LRS", fg='green')
+        except Exception as e:
+            click.echo(f"Предупреждение: не удалось залогировать xAPI событие: {e}", err=True)
+    else:
+        click.echo("Отправка в LRS отменена пользователем.")
