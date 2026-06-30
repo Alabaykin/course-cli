@@ -27,3 +27,24 @@ def test_generate_xapi_statement():
     assert stmt['result']['extensions']['test-ext'] == 123
     assert 'xapi-course' in stmt['object']['id']
 
+@patch('urllib.request.urlopen')
+def test_send_xapi_statement_http(mock_urlopen, tmp_path: Path, monkeypatch):
+    """
+    Проверяет отправку HTTP POST запроса во внешний LRS, 
+    если MOCK_MODE отключен, и запись события в локальный лог.
+    """
+    monkeypatch.chdir(tmp_path)
+    
+    os.environ['LRS_URL'] = 'http://lrs.example.com/data/xAPI/statements'
+    os.environ['LRS_MOCK_MODE'] = 'false'
+    
+    stmt = {'test': 'data'}
+    send_xapi_statement(stmt)
+    
+    # Проверяем вызов POST запроса
+    mock_urlopen.assert_called_once()
+    
+    # Проверяем запись в локальный лог
+    log_path = tmp_path / 'mock_lrs.log'
+    assert log_path.exists()
+    assert '{"test": "data"}' in log_path.read_text(encoding='utf-8')
